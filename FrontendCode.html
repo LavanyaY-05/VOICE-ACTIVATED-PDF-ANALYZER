@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <title>Voice Activated PDF Analyzer</title>
+    <style>
+        body {
+            font-family: poppins;
+            padding: 20px;
+            font-family: "Open Sans", sans-serif;
+            font-optical-sizing: auto;
+            font-style: normal;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h3{
+            color:#757575;
+            text-align: center;
+        }
+        /* Center container for upload elements */
+        #uploadContainer {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap:50px;
+            border-radius: 25px;
+            margin-bottom: 100px;
+            margin-top: 100px;
+            border:1px solid grey;
+            padding: 100px; 
+            margin-left: 400px;
+            margin-right: 400px;/* Add space below upload section */
+        }
+        #uploadContainer label{
+            margin-left: -30px;
+            font-size: 50px;
+        }
+        #fileInput{
+            display: none;
+        }
+        #uploadButton{
+            margin-left:-30px;
+            background-color: #043790;
+        }
+        #qaPdfContainer {
+            display: flex;
+            flex-direction: row;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+            height: 500px;
+            overflow-y: auto;
+        }
+        #qaContainer {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-right: 20px;
+        }
+        #questions {
+            flex: 1;
+            padding: 10px;
+            height: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .qa-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            width: 90%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .qa-box.user {
+            align-self: flex-end;
+            background: rgba(60, 57, 228, 0.96);
+            border: 1px solid #C3C2C2;
+            border-radius: 16px; 
+            color:#fff; 
+        }
+        .qa-box.model {
+            align-self: flex-start;
+            background: rgba(233, 234, 236, 0.32);
+            border: 1px solid #C3C2C2;
+            border-radius: 16px;        
+        }
+        #inputContainer {
+            display: flex;
+            margin-top: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px;
+            background-color:rgba(60, 57, 228, 0.96);
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #pdfContainer {
+            flex: 0 0 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 500px;
+            border: 1px solid black;
+            overflow-y: auto;
+        }
+        #pdfViewerIframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+        }
+        #viewPdfButton {
+            margin-top: 150px;
+            padding: 10px;
+            background-color: #043790;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #viewPdfButton:hover {
+            background-color: #0056b3;
+        }
+        .speaker-button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgba(60, 57, 228, 0.96);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+        }
+        .speaker-button:hover {
+            background-color: #201e9b;
+        }
+    </style>
+</head>
+<body>
+    <h1>Voice Activated PDF Analyzer</h1>
+    <h3>Efficient Document Review</h3>
+    <div id="uploadContainer">
+        <label for="fileInput"><i class="fa-solid fa-file fa-2xl" style="color: #043790;"></i></label>
+        <input type="file" id="fileInput" accept=".pdf" />
+        <button id="uploadButton">Upload and Query</button>
+    </div>
+
+    <div id="qaPdfContainer" style="display: none;">
+        <div id="qaContainer">
+            <div id="questions"></div>
+            <div id="inputContainer">
+                <input type="text" id="queryInput" placeholder="Ask or Type your question here..." />
+                <button id="sendButton">Send</button>
+                 <!-- Audio button for user question -->
+                <button class="speaker-button" id="micButton"><i class="fa-solid fa-microphone" style="color: #fff;"></i></button> <!-- Microphone button -->
+            </div>
+        </div>
+
+        <div id="pdfContainer">
+            <iframe id="pdfViewerIframe" src="" style="display: none;"></iframe>
+            <button id="viewPdfButton">VIEW PDF</button>
+        </div>
+    </div>
+
+    <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+    <script>
+        let currentAudio = null; // Initialize currentAudio variable
+        let isSpeaking = false; // Track if the speech is playing
+        let recognition; // Speech recognition variable
+        let isRecognizing = false; // Track if recognition is active
+
+        // Initialize speech recognition
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false; // Stop after first result
+            recognition.interimResults = false; // No interim results
+
+            recognition.onresult = (event) => {
+                const userQuestion = event.results[0][0].transcript;
+                document.getElementById('queryInput').value = userQuestion; // Set input value to recognized speech
+                recognition.stop(); // Stop recognition
+            };
+
+            recognition.onend = () => {
+                isRecognizing = false; // Update recognition status
+            };
+        } else {
+            alert("Your browser does not support speech recognition.");
+        }
+
+        document.getElementById('viewPdfButton').onclick = () => {
+            const pdfViewerIframe = document.getElementById('pdfViewerIframe');
+            const fileInput = document.getElementById('fileInput');
+            document.getElementById('viewPdfButton').style.display = 'none'; // Hide button
+
+            // Create a URL for the uploaded PDF and set it to the iframe
+            const fileUrl = URL.createObjectURL(fileInput.files[0]);
+            pdfViewerIframe.src = fileUrl;
+            pdfViewerIframe.style.display = 'block'; // Show the PDF viewer
+        };
+
+        document.getElementById('uploadButton').onclick = async () => {
+            const fileInput = document.getElementById('fileInput');
+            const qaPdfContainer = document.getElementById('qaPdfContainer');
+
+            if (!fileInput.files.length) {
+                alert('Please select a PDF file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const response = await fetch('http://localhost:8000/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Network response was not ok');
+                }
+                uploadContainer.style.display = 'none';
+                // Show the Q&A and PDF containers
+                qaPdfContainer.style.display = 'flex';
+
+                // Display the "How can I assist you?" message
+                const questionsDiv = document.getElementById('questions');
+                const assistantMessage = document.createElement('div');
+                assistantMessage.classList.add('qa-box', 'model');
+                assistantMessage.textContent = "How can I assist you?";
+                questionsDiv.appendChild(assistantMessage);
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        };
+
+        // Send question and display answer
+        document.getElementById('sendButton').onclick = async () => {
+            const queryInput = document.getElementById('queryInput');
+            const questionsDiv = document.getElementById('questions');
+
+            if (!queryInput.value.trim()) {
+                alert('Please enter a question.');
+                return;
+            }
+
+            // Display the user's question
+            const userQuestion = document.createElement('div');
+            userQuestion.classList.add('qa-box', 'user');
+            userQuestion.textContent = queryInput.value;
+            questionsDiv.appendChild(userQuestion);
+
+            const response = await fetch('http://localhost:8000/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: queryInput.value }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                // Display the model's answer
+                const generatedAnswer = document.createElement('div');
+                generatedAnswer.classList.add('qa-box', 'model');
+                generatedAnswer.innerHTML = `
+                    <span>${data.answer}</span>
+                    <button class="speaker-button answerSpeakerButton">&#128264;</button>
+                `;
+                questionsDiv.appendChild(generatedAnswer);
+
+                // Start the speech synthesis for the generated answer by default
+                playSpeech(data.answer);
+
+                // Handle the speaker button toggle for stopping or restarting speech
+                const answerSpeakerButton = generatedAnswer.querySelector('.answerSpeakerButton');
+                answerSpeakerButton.onclick = () => {
+                    if (isSpeaking) {
+                        stopSpeech(); // Stop speech if it is already playing
+                    } else {
+                        playSpeech(data.answer); // Play the speech for the generated answer
+                    }
+                };
+
+                // Clear the input field
+                queryInput.value = '';
+
+                // Ask the user for more questions
+                const followUpMessage = document.createElement('div');
+                followUpMessage.classList.add('qa-box', 'model');
+                followUpMessage.textContent = "Do you have any further questions?";
+                questionsDiv.appendChild(followUpMessage);
+            } else {
+                alert('Error: Unable to get a response from the server.');
+            }
+        };
+
+        function playSpeech(text) {
+            if (currentAudio) {
+                currentAudio.pause(); // Pause any current audio
+            }
+            const speech = new SpeechSynthesisUtterance(text);
+            currentAudio = speech; // Set the current audio to the new speech
+            speech.onend = () => {
+                isSpeaking = false; // Update speaking status
+                currentAudio = null; // Clear current audio
+            };
+            speechSynthesis.speak(speech);
+            isSpeaking = true; // Update speaking status
+        }
+
+        function stopSpeech() {
+            speechSynthesis.cancel(); // Stop any ongoing speech
+            isSpeaking = false; // Update speaking status
+            currentAudio = null; // Clear current audio
+        }
+
+        // Start speech recognition on microphone button click
+        document.getElementById('micButton').onclick = () => {
+            if (!isRecognizing) {
+                recognition.start(); // Start recognition
+                isRecognizing = true; // Update recognition status
+            }
+        };
+    </script>
+</body>
+</html>
